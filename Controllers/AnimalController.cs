@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace AdocaoPetApi.Controllers
 {
-    [Route("api")]
+    [ApiController, Route("api")]
     public class AnimalController : ControllerBase
     {
         private readonly DataContext _context;

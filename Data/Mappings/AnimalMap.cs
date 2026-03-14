@@ -16,10 +16,6 @@ namespace AdocaoPetApi.Data.Mappings
 
             builder.Property(a => a.Id)
                     .ValueGeneratedOnAdd();
-
-            builder.Property(a => a.Nome)
-                    .IsRequired()
-                    .HasMaxLength(100);
             
             builder.Property(a => a.Especie)
                     .IsRequired()

@@ -157,3 +157,5 @@
 /home/gabriel/Documentos/Projetos/AdocaoPetApi/obj/Debug/net10.0/AdocaoPetApi.pdb
 /home/gabriel/Documentos/Projetos/AdocaoPetApi/obj/Debug/net10.0/AdocaoPetApi.genruntimeconfig.cache
 /home/gabriel/Documentos/Projetos/AdocaoPetApi/obj/Debug/net10.0/ref/AdocaoPetApi.dll
+/home/gabriel/Documentos/Projetos/AdocaoPetApi/bin/Debug/net10.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/home/gabriel/Documentos/Projetos/AdocaoPetApi/bin/Debug/net10.0/SecureIdentity.dll

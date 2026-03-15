@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RKStYVKl47k=",
+  "dgSpecHash": "KzdclEZ3N1A=",
   "success": true,
   "projectFilePath": "/home/gabriel/Documentos/Projetos/AdocaoPetApi/AdocaoPetApi.csproj",
   "expectedPackageFiles": [
@@ -41,6 +41,7 @@
     "/home/gabriel/.nuget/packages/microsoft.visualstudio.solutionpersistence/1.0.52/microsoft.visualstudio.solutionpersistence.1.0.52.nupkg.sha512",
     "/home/gabriel/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/home/gabriel/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
+    "/home/gabriel/.nuget/packages/secureidentity/1.0.4/secureidentity.1.0.4.nupkg.sha512",
     "/home/gabriel/.nuget/packages/system.clientmodel/1.5.1/system.clientmodel.1.5.1.nupkg.sha512",
     "/home/gabriel/.nuget/packages/system.codedom/6.0.0/system.codedom.6.0.0.nupkg.sha512",
     "/home/gabriel/.nuget/packages/system.composition/9.0.0/system.composition.9.0.0.nupkg.sha512",

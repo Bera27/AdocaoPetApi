@@ -9,5 +9,6 @@ namespace AdocaoPetApi.Models
         public string Senha { get; set; } = string.Empty;
 
         public ICollection<Animal> Animais { get; set; } = [];
+        public ICollection<Role> Roles { get; set; } = [];
     }
 }

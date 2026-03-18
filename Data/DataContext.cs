@@ -9,6 +9,7 @@ namespace AdocaoPetApi.Data
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Animal> Animais { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -16,6 +17,7 @@ namespace AdocaoPetApi.Data
         {
             modelBuilder.ApplyConfiguration(new UsuarioMap());
             modelBuilder.ApplyConfiguration(new AnimalMap());
+            modelBuilder.ApplyConfiguration(new RoleMap());
         }
     }
 }

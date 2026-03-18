@@ -47,8 +47,8 @@ namespace AdocaoPetApi.Data.Mappings
                         user => user
                                 .HasOne<Usuario>()
                                 .WithMany()
-                                .HasForeignKey("UserId")
-                                .HasConstraintName("FK_UserRole_UserId")
+                                .HasForeignKey("UsuarioId")
+                                .HasConstraintName("FK_UsuarioRole_UsuarioId")
                                 .OnDelete(DeleteBehavior.Cascade));
         }
     }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using AdocaoPetApi.Models;
 
 namespace AdocaoPetApi.DTOs
 {
@@ -6,6 +7,9 @@ namespace AdocaoPetApi.DTOs
     {
         [Required(ErrorMessage = "O Nome é obrigatório")]
         public string Nome { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "O Nome é obrigatório")]
+        public string NomeRole { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O Telefone é obrigatório")]
         public string Telefone { get; set; } = string.Empty;

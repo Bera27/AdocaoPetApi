@@ -21,15 +21,24 @@ namespace AdocaoPetApi.Controllers
         public async Task<IActionResult> Post(
             [FromBody] RegistrarDTO model)
         {
+            if(model.NomeRole.Equals("Admin"))
+                return BadRequest(new ResultDTO<string>("Não é permitido criar administradores"));
+
+            var role = await _context.Roles.FirstOrDefaultAsync(x => x.Nome == model.NomeRole);
+
+            if(role == null)
+                return NotFound("O perfil/Role informado não existe.");
+
+
             var usuario = new Usuario
             {
                 Nome = model.Nome,
                 Email = model.Email,
                 Telefone = model.Telefone,
-                Senha = model.Senha
+                Senha = PasswordHasher.Hash(model.Senha)
             };
 
-            usuario.Senha = PasswordHasher.Hash(model.Senha);
+            usuario.Roles.Add(role);
 
             try
             {
@@ -38,7 +47,8 @@ namespace AdocaoPetApi.Controllers
 
                 return Ok(new ResultDTO<dynamic>(new
                 {
-                    usuario = usuario.Email, usuario.Senha
+                    usuario = usuario.Email,
+                    perfil = role.Nome
                 }));
             }
             catch (Exception)
@@ -53,6 +63,7 @@ namespace AdocaoPetApi.Controllers
         {
             var usuario = await _context.Usuarios
                                     .AsNoTracking()
+                                    .Include(x => x.Roles)
                                     .FirstOrDefaultAsync(x => x.Email == model.Email);
 
             if(usuario == null)

@@ -18,7 +18,9 @@ namespace AdocaoPetApi.Controllers
         => _context = context;
 
         [HttpGet("v1/animal")]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync(
+            [FromQuery] int page = 0,
+            [FromQuery] int pageSize = 25)
         {
             try
             {
@@ -42,9 +44,17 @@ namespace AdocaoPetApi.Controllers
                                         Status = x.Status,
                                         FotoUrl = x.FotoUrl
                                     })
+                                    .Skip(page * pageSize)
+                                    .Take(pageSize)
+                                    .OrderByDescending(x => x.DataCadastro)
                                     .ToListAsync();
 
-                return Ok(new ResultDTO<List<GetAnimalDTO>>(animais));
+                return Ok(new ResultDTO<dynamic>(new
+                {
+                    page,
+                    pageSize,
+                    animais
+                }));
             }
             catch (Exception)
             {
@@ -89,6 +99,100 @@ namespace AdocaoPetApi.Controllers
             catch (Exception)
             {
                 return StatusCode(500, new ResultDTO<string>("SSA20 - Erro interno no servidor"));
+            }
+        }
+
+        [HttpGet("v1/animal/especie/{especie}")]
+        public async Task<IActionResult> GetEspecie(
+            [FromRoute] string especie,
+            [FromQuery] int page = 0,
+            [FromQuery] int pageSize = 25)
+        {
+            try
+            {
+                var animais = await _context.Animais
+                                        .AsNoTracking()
+                                        .Include(x => x.Usuario)
+                                        .Where(x => x.Especie == especie)
+                                        .Select(x => new GetAnimalDTO
+                                        {
+                                            Id = x.Id,
+                                            Nome = x.Usuario.Nome,
+                                            Telefone = x.Usuario.Telefone,
+                                            Especie = x.Especie,
+                                            Raca = x.Raca,
+                                            Idade = x.Idade,
+                                            Sexo = x.Sexo,
+                                            Descricao = x.Descricao,
+                                            Porte = x.Porte,
+                                            Saude = x.Saude,
+                                            Historia = x.Historia,
+                                            DataCadastro = x.DataCadastro,
+                                            Status = x.Status,
+                                            FotoUrl = x.FotoUrl
+                                        })
+                                        .OrderByDescending(x => x.DataCadastro)
+                                        .Skip(page * pageSize)
+                                        .Take(pageSize)
+                                        .ToListAsync();
+
+                return Ok(new ResultDTO<dynamic>(new
+                {
+                    page,
+                    pageSize,
+                    animais
+                }));
+            }
+            catch(Exception)
+            {
+                return StatusCode(500, new ResultDTO<string>("LMHG12 - Erro interno no servidor"));
+            }
+        }
+
+        [HttpGet("v1/animal/raca/{raca}")]
+        public async Task<IActionResult> GetRaca(
+            [FromRoute] string raca,
+            [FromQuery] int page = 0,
+            [FromQuery] int pageSize = 25)
+        {
+            try
+            {
+                var animais = await _context.Animais
+                                    .AsNoTracking()
+                                    .Include(x => x.Usuario)
+                                    .Where(x => x.Raca == raca)
+                                    .Select(x => new GetAnimalDTO
+                                    {
+                                        Id = x.Id,
+                                        Nome = x.Usuario.Nome,
+                                        Telefone = x.Usuario.Telefone,
+                                        Especie = x.Especie,
+                                        Raca = x.Raca,
+                                        Idade = x.Idade,
+                                        Sexo = x.Sexo,
+                                        Descricao = x.Descricao,
+                                        Porte = x.Porte,
+                                        Saude = x.Saude,
+                                        Historia = x.Historia,
+                                        DataCadastro = x.DataCadastro,
+                                        Status = x.Status,
+                                        FotoUrl = x.FotoUrl
+                                    })
+                                    .OrderByDescending(x => x.DataCadastro)
+                                    .Skip(page * pageSize)
+                                    .Take(pageSize)
+                                    .ToListAsync();
+                
+                return Ok(new ResultDTO<dynamic>(new
+                {
+                    page,
+                    pageSize,
+                    animais
+                }));
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ResultDTO<string>("JHFGR15 - Erro interno no servidor"));
             }
         }
 

@@ -27,7 +27,7 @@ namespace AdocaoPetApi.Controllers
             var role = await _context.Roles.FirstOrDefaultAsync(x => x.Nome == model.NomeRole);
 
             if(role == null)
-                return NotFound("O perfil/Role informado não existe.");
+                return NotFound(new ResultDTO<string>("O perfil/Role informado não existe."));
 
 
             var usuario = new Usuario

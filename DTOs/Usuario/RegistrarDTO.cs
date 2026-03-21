@@ -8,7 +8,7 @@ namespace AdocaoPetApi.DTOs
         [Required(ErrorMessage = "O Nome é obrigatório")]
         public string Nome { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "O Nome é obrigatório")]
+        [Required(ErrorMessage = "O Perfil/Role é obrigatório")]
         public string NomeRole { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O Telefone é obrigatório")]

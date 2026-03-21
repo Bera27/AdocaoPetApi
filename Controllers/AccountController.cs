@@ -1,6 +1,7 @@
 using AdocaoPetApi.Data;
 using AdocaoPetApi.DTOs;
 using AdocaoPetApi.DTOs.Usuario;
+using AdocaoPetApi.Extensions;
 using AdocaoPetApi.Models;
 using AdocaoPetApi.Services;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,9 @@ namespace AdocaoPetApi.Controllers
         public async Task<IActionResult> Post(
             [FromBody] RegistrarDTO model)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(new ResultDTO<string>(ModelState.GetErrors()));
+
             if(model.NomeRole.Equals("Admin"))
                 return BadRequest(new ResultDTO<string>("Não é permitido criar administradores"));
 

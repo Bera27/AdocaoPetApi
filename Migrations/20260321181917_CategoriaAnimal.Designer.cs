@@ -4,6 +4,7 @@ using AdocaoPetApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdocaoPetApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260321181917_CategoriaAnimal")]
+    partial class CategoriaAnimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,6 +31,9 @@ namespace AdocaoPetApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("CategoriaAnimalId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DataCadastro")
                         .HasColumnType("datetime2");
 
@@ -35,6 +41,11 @@ namespace AdocaoPetApi.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Especie")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("FotoUrl")
                         .IsRequired()
@@ -82,7 +93,7 @@ namespace AdocaoPetApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdCategoriaAnimal");
+                    b.HasIndex("CategoriaAnimalId");
 
                     b.HasIndex("UsuarioId");
 
@@ -99,12 +110,11 @@ namespace AdocaoPetApi.Migrations
 
                     b.Property<string>("NomeCategoria")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("CategoriaAnimals");
+                    b.ToTable("CategoriaAnimal");
                 });
 
             modelBuilder.Entity("AdocaoPetApi.Models.Role", b =>
@@ -178,10 +188,9 @@ namespace AdocaoPetApi.Migrations
                 {
                     b.HasOne("AdocaoPetApi.Models.CategoriaAnimal", "CategoriaAnimal")
                         .WithMany("AnimaisCategorias")
-                        .HasForeignKey("IdCategoriaAnimal")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Animal_CategoriaAnimal");
+                        .HasForeignKey("CategoriaAnimalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("AdocaoPetApi.Models.Usuario", "Usuario")
                         .WithMany("Animais")

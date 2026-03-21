@@ -13,7 +13,7 @@ namespace AdocaoPetApi.DTOs.Animal
 
         // Dados do Pet
         public Guid Id { get; set; }
-        public string Especie { get; set; } = string.Empty;
+        public string Categoria { get; set; } = string.Empty;
         public string Raca { get; set; } = string.Empty;
         public int Idade { get; set; }
         public string Sexo { get; set; } = string.Empty;

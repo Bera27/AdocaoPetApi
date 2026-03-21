@@ -1,11 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using AdocaoPetApi.Data;
 using AdocaoPetApi.DTOs;
 using AdocaoPetApi.DTOs.Animal;
+using AdocaoPetApi.Extensions;
 using AdocaoPetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace AdocaoPetApi.Controllers
 {
@@ -27,12 +26,13 @@ namespace AdocaoPetApi.Controllers
                 var animais = await _context.Animais
                                     .AsNoTracking()
                                     .Include(u => u.Usuario)
+                                    .Include(x => x.CategoriaAnimal)
                                     .Select(x => new GetAnimalDTO
                                     {
                                         Id = x.Id,
                                         Nome = x.Usuario.Nome,
                                         Telefone = x.Usuario.Telefone,
-                                        Especie = x.Especie,
+                                        Categoria = x.CategoriaAnimal.NomeCategoria,
                                         Raca = x.Raca,
                                         Idade = x.Idade,
                                         Sexo = x.Sexo,
@@ -71,13 +71,14 @@ namespace AdocaoPetApi.Controllers
                 var animal = await _context.Animais
                                     .AsNoTracking()
                                     .Include(u => u.Usuario)
+                                    .Include(x => x.CategoriaAnimal)
                                     .Where(x => x.Id == id)
                                     .Select(x => new GetAnimalDTO
                                     {
                                         Id = x.Id,
                                         Nome = x.Usuario.Nome,
                                         Telefone = x.Usuario.Telefone,
-                                        Especie = x.Especie,
+                                        Categoria = x.CategoriaAnimal.NomeCategoria,
                                         Raca = x.Raca,
                                         Idade = x.Idade,
                                         Sexo = x.Sexo,
@@ -102,9 +103,9 @@ namespace AdocaoPetApi.Controllers
             }
         }
 
-        [HttpGet("v1/animal/especie/{especie}")]
-        public async Task<IActionResult> GetEspecie(
-            [FromRoute] string especie,
+        [HttpGet("v1/animal/categoria/{nomeCategoria}")]
+        public async Task<IActionResult> GetCategoria(
+            [FromRoute] string nomeCategoria,
             [FromQuery] int page = 0,
             [FromQuery] int pageSize = 25)
         {
@@ -113,13 +114,14 @@ namespace AdocaoPetApi.Controllers
                 var animais = await _context.Animais
                                         .AsNoTracking()
                                         .Include(x => x.Usuario)
-                                        .Where(x => x.Especie == especie)
+                                        .Include(x => x.CategoriaAnimal)
+                                        .Where(x => x.CategoriaAnimal.NomeCategoria == nomeCategoria)
                                         .Select(x => new GetAnimalDTO
                                         {
                                             Id = x.Id,
                                             Nome = x.Usuario.Nome,
                                             Telefone = x.Usuario.Telefone,
-                                            Especie = x.Especie,
+                                            Categoria = x.CategoriaAnimal.NomeCategoria,
                                             Raca = x.Raca,
                                             Idade = x.Idade,
                                             Sexo = x.Sexo,
@@ -160,13 +162,14 @@ namespace AdocaoPetApi.Controllers
                 var animais = await _context.Animais
                                     .AsNoTracking()
                                     .Include(x => x.Usuario)
+                                    .Include(x => x.CategoriaAnimal)
                                     .Where(x => x.Raca == raca)
                                     .Select(x => new GetAnimalDTO
                                     {
                                         Id = x.Id,
                                         Nome = x.Usuario.Nome,
                                         Telefone = x.Usuario.Telefone,
-                                        Especie = x.Especie,
+                                        Categoria = x.CategoriaAnimal.NomeCategoria,
                                         Raca = x.Raca,
                                         Idade = x.Idade,
                                         Sexo = x.Sexo,
@@ -200,12 +203,15 @@ namespace AdocaoPetApi.Controllers
         public async Task<IActionResult> PostAsync(
             [FromBody] PostAnimalDTO model)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(new ResultDTO<string>(ModelState.GetErrors()));
+
             try
             {
                 var animal = new Animal
                 {
                     UsuarioId = model.UsuarioId,
-                    Especie = model.Especie,
+                    IdCategoriaAnimal = model.IdCategoriaAnimal,
                     Raca = model.Raca,
                     Idade = model.Idade,
                     Sexo = model.Sexo,
@@ -222,6 +228,10 @@ namespace AdocaoPetApi.Controllers
 
                 return Created($"api/v1/animal/{animal.Id}", new ResultDTO<Animal>(animal));
             }
+            catch(DbUpdateException)
+            {
+                return StatusCode(500, new ResultDTO<string>("HHAW21 - Não foi possível incluir o animal"));
+            }
             catch (Exception)
             {
                 return StatusCode(500, new ResultDTO<string>("AFAF30 - Erro interno no servidor"));
@@ -233,6 +243,9 @@ namespace AdocaoPetApi.Controllers
             [FromRoute] Guid id,
             [FromBody] PostAnimalDTO model)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(new ResultDTO<string>(ModelState.GetErrors()));
+
             try
             {
                 var animal = await _context.Animais
@@ -241,7 +254,7 @@ namespace AdocaoPetApi.Controllers
                 if(animal == null)
                     return NotFound("Animal não encontrado.");
 
-                animal.Especie = model.Especie;
+                animal.IdCategoriaAnimal = model.IdCategoriaAnimal;
                 animal.Raca = model.Raca;
                 animal.Idade = model.Idade;
                 animal.Sexo = model.Sexo;
@@ -256,6 +269,10 @@ namespace AdocaoPetApi.Controllers
                 await _context.SaveChangesAsync();
 
                 return Created($"api/v1/animal/{animal.Id}", new ResultDTO<Animal>(animal));                
+            }
+            catch(DbUpdateException)
+            {
+                return StatusCode(500, new ResultDTO<string>("HHAW21 - Não foi possível Alterar o animal"));
             }
             catch (Exception)
             {

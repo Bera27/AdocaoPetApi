@@ -3,7 +3,6 @@ namespace AdocaoPetApi.Models
     public class Animal
     {
         public Guid Id { get; set; }
-        public string Especie { get; set; } = string.Empty;
         public string Raca { get; set; } = string.Empty;
         public int Idade { get; set; }
         public string Sexo { get; set; } = string.Empty;
@@ -17,5 +16,7 @@ namespace AdocaoPetApi.Models
 
         public Usuario Usuario { get; set; } = default!;
         public Guid UsuarioId { get; set; }
+        public int IdCategoriaAnimal { get; set; }
+        public CategoriaAnimal CategoriaAnimal { get; set; } = null!;
     }
 }

@@ -55,6 +55,10 @@ namespace AdocaoPetApi.Controllers
                     perfil = role.Nome
                 }));
             }
+            catch(DbUpdateException)
+            {
+                return StatusCode(500, new ResultDTO<string>("Email já cadastrado"));
+            }
             catch (Exception)
             {
                 return StatusCode(500, new ResultDTO<string>("AWFA10 - Erro interno no servidor"));

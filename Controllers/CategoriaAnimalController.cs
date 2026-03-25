@@ -3,6 +3,8 @@ using AdocaoPetApi.DTOs;
 using AdocaoPetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AdocaoPetApi.Controllers
 {
@@ -10,23 +12,34 @@ namespace AdocaoPetApi.Controllers
     public class CategoriaAnimalController : ControllerBase
     {
         private readonly DataContext _context;
+        private const string CATEGORIA_CACHE_KEY = "CategoriaAnimais";
+
         public CategoriaAnimalController(DataContext context)
             => _context = context;
 
         
         [HttpGet("v1/Categorias")]
         public async Task<IActionResult> GetAsync(
+            [FromServices] IMemoryCache cache,
             [FromQuery] int page = 0,
             [FromQuery] int pageSize = 25
         )
         {
             try
             {
-                var categorias = await _context.CategoriaAnimals
+                if(!cache.TryGetValue(CATEGORIA_CACHE_KEY, out List<CategoriaAnimal> categorias))
+                {
+                    categorias = await _context.CategoriaAnimals
                                         .AsNoTracking()
                                         .Skip(page * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync();
+
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+                    cache.Set(CATEGORIA_CACHE_KEY, categorias, cacheOptions);
+                }
 
                 return Ok(new ResultDTO<dynamic>(new
                 {

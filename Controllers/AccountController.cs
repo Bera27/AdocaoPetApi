@@ -7,16 +7,18 @@ using AdocaoPetApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SecureIdentity.Password;
 
 namespace AdocaoPetApi.Controllers
 {
     
     [ApiController, Route("api/")]
-    public class AccountController(TokenService tokenService, DataContext context) : ControllerBase
+    public class AccountController(TokenService tokenService, DataContext context, IMemoryCache cache) : ControllerBase
     {
         private readonly TokenService _tokenService = tokenService;
         private readonly DataContext _context = context;
+        private readonly IMemoryCache _cache = cache;
 
         [HttpPost("v1/accounts")]
         public async Task<IActionResult> Post(
@@ -28,7 +30,22 @@ namespace AdocaoPetApi.Controllers
             if(model.NomeRole.Equals("Admin"))
                 return BadRequest(new ResultDTO<string>("Não é permitido criar administradores"));
 
-            var role = await _context.Roles.FirstOrDefaultAsync(x => x.Nome == model.NomeRole);
+            var cacheKey = $"role:{model.NomeRole}";
+
+            if(!_cache.TryGetValue(cacheKey, out Role? role))
+            {
+                role = await _context.Roles
+                    .FirstOrDefaultAsync(x => x.Nome == model.NomeRole);
+                
+                if(role != null)
+                {
+                    _cache.Set(cacheKey, role, new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12),
+                        SlidingExpiration = TimeSpan.FromHours(6)
+                    });
+                }
+            }
 
             if(role == null)
                 return NotFound(new ResultDTO<string>("O perfil/Role informado não existe."));

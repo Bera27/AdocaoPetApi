@@ -1,6 +1,7 @@
 using AdocaoPetApi.Data;
 using AdocaoPetApi.DTOs;
 using AdocaoPetApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -9,25 +10,22 @@ using Microsoft.Extensions.Caching.Memory;
 namespace AdocaoPetApi.Controllers
 {
     [ApiController, Route("api")]
-    public class CategoriaAnimalController : ControllerBase
+    [Authorize(Roles = "Admin")]
+    public class CategoriaAnimalController(DataContext context, IMemoryCache cache) : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly DataContext _context = context;
+        private readonly IMemoryCache _cache = cache;
         private const string CATEGORIA_CACHE_KEY = "CategoriaAnimais";
 
-        public CategoriaAnimalController(DataContext context)
-            => _context = context;
-
-        
-        [HttpGet("v1/Categorias")]
+        [HttpGet("v1/categorias")]
         public async Task<IActionResult> GetAsync(
-            [FromServices] IMemoryCache cache,
             [FromQuery] int page = 0,
             [FromQuery] int pageSize = 25
         )
         {
             try
             {
-                if(!cache.TryGetValue(CATEGORIA_CACHE_KEY, out List<CategoriaAnimal> categorias))
+                if(!_cache.TryGetValue(CATEGORIA_CACHE_KEY, out List<CategoriaAnimal> categorias))
                 {
                     categorias = await _context.CategoriaAnimals
                                         .AsNoTracking()
@@ -35,10 +33,11 @@ namespace AdocaoPetApi.Controllers
                                         .Take(pageSize)
                                         .ToListAsync();
 
-                    var cacheOptions = new MemoryCacheEntryOptions()
-                            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-                    cache.Set(CATEGORIA_CACHE_KEY, categorias, cacheOptions);
+                    _cache.Set(CATEGORIA_CACHE_KEY, categorias, new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12),
+                        SlidingExpiration = TimeSpan.FromHours(6)
+                    });
                 }
 
                 return Ok(new ResultDTO<dynamic>(new
@@ -54,7 +53,7 @@ namespace AdocaoPetApi.Controllers
             }
         }
 
-        [HttpGet("v1/Categorias/{id:int}")]
+        [HttpGet("v1/categorias/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
         {
             try
@@ -71,6 +70,29 @@ namespace AdocaoPetApi.Controllers
             catch (Exception)
             {
                 return StatusCode(500, new ResultDTO<string>("JKUG14 - Erro interno no servidor"));
+            }
+        }
+
+        [HttpDelete("v1/categorias/{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            try
+            {
+                var categoria = await _context.CategoriaAnimals
+                                        .FirstOrDefaultAsync(x => x.Id == id);
+
+                if(categoria == null)
+                    return NotFound(new ResultDTO<string>("Categoria não encontrada"));
+                
+                _context.Remove(categoria);
+                await _context.SaveChangesAsync();
+                _cache.Remove(CATEGORIA_CACHE_KEY);
+                
+                return Ok(new ResultDTO<CategoriaAnimal>(categoria));
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ResultDTO<string>("HGYP41 - Erro interno no servidor"));
             }
         }
     }

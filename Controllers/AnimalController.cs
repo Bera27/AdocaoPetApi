@@ -3,12 +3,14 @@ using AdocaoPetApi.DTOs;
 using AdocaoPetApi.DTOs.Animal;
 using AdocaoPetApi.Extensions;
 using AdocaoPetApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdocaoPetApi.Controllers
 {
     [ApiController, Route("api")]
+    [Authorize(Roles = "Admin, Doador")]
     public class AnimalController : ControllerBase
     {
         private readonly DataContext _context;
@@ -17,6 +19,7 @@ namespace AdocaoPetApi.Controllers
         => _context = context;
 
         [HttpGet("v1/animal")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync(
             [FromQuery] int page = 0,
             [FromQuery] int pageSize = 25)
